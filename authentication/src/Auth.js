@@ -4,12 +4,12 @@ class Auth {
   auth0 = new WebAuth({
     domain: 'react-security-co.auth0.com',
     clientID: 'OKc5y1CNnXLXDbuQSkFCvmZp1IffSu7G',
-    redirectUri: 'https://localhost:1234/callback',
+    redirectUri: 'http://localhost:1234/callback',
     responseType: 'token'
   });
 
   login = () => {
-    // TODO
+    this.auth0.authorize();
   }
 
   handleAuthentication = () => {
