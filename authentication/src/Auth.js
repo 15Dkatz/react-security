@@ -1,4 +1,5 @@
 import auth0, { WebAuth } from 'auth0-js';
+import history from './history';
 
 class Auth {
   auth0 = new WebAuth({
@@ -13,7 +14,18 @@ class Auth {
   }
 
   handleAuthentication = () => {
-    // TODO
+    this.auth0.parseHash((err, authResult) => {
+      if (authResult) {
+        localStorage.setItem('access_token', authResult.accessToken);
+        localStorage.setItem(
+          'expires_at',
+          JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime())
+        );
+        history.replace('/');
+      } else if (err) {
+        console.log('err', err);
+      }
+    });
   }
 
   logout = () => {

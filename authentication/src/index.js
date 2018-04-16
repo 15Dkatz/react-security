@@ -9,6 +9,7 @@ const auth = new Auth();
 
 const callbackComponent = props => {
   if (props.location.hash.includes('access_token')) {
+    setTimeout(() => auth.handleAuthentication());
     return <h4>loading...</h4>;
   } else {
     return <Redirect to={{ pathname: '/' }} />
