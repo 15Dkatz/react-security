@@ -29,12 +29,13 @@ class Auth {
   }
 
   logout = () => {
-    // TODO
+    ['access_token', 'expires_at']
+      .forEach(item => localStorage.removeItem(item));
+    history.replace('/');
   }
 
   isAuthenticated = () => {
-    return false;
-    // TODO
+    return new Date().getTime() < +localStorage.getItem('expires_at');
   }
 };
 
