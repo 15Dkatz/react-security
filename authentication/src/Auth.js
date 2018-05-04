@@ -3,11 +3,13 @@ import history from './history';
 
 class Auth {
   auth0 = new WebAuth({
-    domain: 'react-security-co.auth0.com',
-    clientID: 'OKc5y1CNnXLXDbuQSkFCvmZp1IffSu7G',
+    domain: 'react-security-com.auth0.com',
+    clientID: '9NJkv57SEU0JfZ7VyFUnQitu4ReiByk4',
     redirectUri: 'http://localhost:1234/callback',
     responseType: 'token'
   });
+
+  loggedIn = false;
 
   login = () => {
     this.auth0.authorize();
@@ -21,6 +23,9 @@ class Auth {
           'expires_at',
           JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime())
         );
+
+        this.loggedIn = true;
+
         history.replace('/');
       } else if (err) {
         console.log('err', err);
@@ -29,13 +34,14 @@ class Auth {
   }
 
   logout = () => {
-    ['access_token', 'expires_at']
-      .forEach(item => localStorage.removeItem(item));
+    ['access_token', 'expires_at'].forEach(item => localStorage.removeItem(item));
+    this.loggedIn = false;
     history.replace('/');
   }
 
   isAuthenticated = () => {
-    return new Date().getTime() < +localStorage.getItem('expires_at');
+    return this.loggedIn &&
+      new Date().getTime() < +localStorage.getItem('expires_at');
   }
 };
 
