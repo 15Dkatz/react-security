@@ -1,8 +1,8 @@
 CREATE TABLE users(
-  username character(64),
-  password character(64)
+  username_hash character(64),
+  password_hash character(64)
 );
 
-INSERT INTO users(username, password) VALUES
+INSERT INTO users(username_hash, password_hash) VALUES
 ('foo123', 'pass123'),
 ('bar456', 'word456');
