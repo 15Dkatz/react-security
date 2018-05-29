@@ -12,6 +12,42 @@ router.get('/all', (req, res, next) => {
   });
 });
 
+const set_session_cookie = (session_str, res) => {
+  res.cookie('session_str', session_str, {
+    expire: Date.now() + 3600000,
+    httpOnly: true,
+    // secure: true // use with https for a secure cookie
+  });
+}
+
+const set_session = (username, res, session_id) => {
+  let session, session_str;
+
+  if (session_id) {
+    session_str = Session.dataToString(username, session_id);
+  } else {
+    session = new Session(username);
+    session_str = session.toString();
+  }
+
+  return new Promise((resolve, reject) => {
+    if (session_id) {
+      set_session_cookie(session_str, res);
+      resolve();
+    } else {
+      pool.query(
+        'UPDATE users SET session_id = $1 WHERE username_hash = $2',
+        [session.id, hash(username)],
+        (q_err, q_res) => {
+          if (q_err) return reject(q_err);
+          set_session_cookie(session_str, res);
+          resolve();
+        }
+      );
+    }
+  });
+};
+
 router.post('/new', (req, res, next) => {
   const { username, password } = req.body;
   const username_hash = hash(username);
@@ -29,15 +65,11 @@ router.post('/new', (req, res, next) => {
           (q1_err, q1_res) => {
             if (q1_err) return next(q1_err);
 
-            const session = new Session(username);
-            const session_str = session.toString();
-            res.cookie('session_str', session_str, {
-              expire: Date.now() + 3600000,
-              httpOnly: true,
-              // secure: true // use with https for a secure cookie
-            });
-
-            res.json({ msg: 'Successfully created user!' });
+            set_session(username, res)
+              .then(() => {
+                res.json({ msg: 'Successfully created user!' });
+              })
+              .catch(error => next(error));
           }
         )
       } else {
@@ -46,6 +78,63 @@ router.post('/new', (req, res, next) => {
           msg: 'This username has been taken'
         });
       }
+    }
+  )
+});
+
+router.post('/login', (req, res, next) => {
+  const { username, password } = req.body;
+
+  pool.query(
+    'SELECT * FROM users WHERE username_hash = $1',
+    [hash(username)],
+    (q_err, q_res) => {
+      if (q_err) return next(q_err);
+
+      const user = q_res.rows[0];
+
+      if (user && user.password_hash === hash(password)) {
+        set_session(username, res, user.session_id)
+          .then(() => {
+            res.json({ msg: 'Successful login!' });
+          })
+          .catch(error => next(error));
+      } else {
+        res.status(400).json({ type: 'error', msg: 'Incorrect username/password' });
+      }
+    }
+  );
+});
+
+router.get('/logout', (req, res, next) => {
+  const { username, id } = Session.parse(req.cookies.session_str);
+
+  pool.query(
+    'UPDATE users SET session_id = NULL WHERE username_hash = $1',
+    [hash(username)],
+    (q_err, q_res) => {
+      if (q_err) return next(q_err);
+
+      res.clearCookie('session_str');
+      res.json({ msg: 'Successful logout' });
+    }
+  )
+});
+
+router.get('/authenticated', (req, res, next) => {
+  const { username, id } = Session.parse(req.cookies.session_str);
+
+  pool.query(
+    'SELECT * FROM users WHERE username_hash = $1',
+    [hash(username)],
+    (q_err, q_res) => {
+      if (q_err) return next(q_err);
+      if (q_res.rows.length === 0) return next(new Error('Not a valid username'));
+
+      res.json({
+        authenticated: Session.verify(req.cookies.session_str) &&
+          q_res.rows[0].session_id === id
+      });
     }
   )
 });
