@@ -17,3 +17,6 @@ Some of the main course highlights:
 - Explore Cross-Site Scripting in code.
 - Compare dangerous JavaScript methods and practices in code.
 - Grasp the history of React in response to Security.
+
+### The course also includes a full-stack authentication project.
+This includes Node, PostgreSQL, and React for a full-stack web application that creates user accounts and sessions.
