@@ -1,0 +1,3 @@
+database: postgres://dbwbapmsdoowtw:9ee8f394c7fcaea7b9b803d15f3fab969abccd75356e4691e9159d447132ca02@ec2-23-23-247-222.compute-1.amazonaws.com:5432/d6k1oq1ia248qd
+backend: https://fa-backend.herokuapp.com/
+frontend: https://fa-frontend.herokuapp.com/

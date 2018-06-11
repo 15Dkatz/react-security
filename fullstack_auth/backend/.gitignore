@@ -1,2 +1,2 @@
-secrets/
 node_modules/
+DB_PASSWORD.secret

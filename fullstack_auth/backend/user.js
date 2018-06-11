@@ -16,7 +16,7 @@ const set_session_cookie = (session_str, res) => {
   res.cookie('session_str', session_str, {
     expire: Date.now() + 3600000,
     httpOnly: true,
-    // secure: true // use with https for a secure cookie
+    secure: process.env.MODE == 'production' // use with https for a secure cookie
   });
 }
 
