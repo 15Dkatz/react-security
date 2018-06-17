@@ -1,4 +1,4 @@
-### React, Security, & Full-Stack Auth with Node and PostgreSQL
+## React, Security, & Full-Stack Auth with Node and PostgreSQL
 
 The offical code for the *React, Security, & Full-Stack Auth with Node and PostgreSQL* course on Udemy by David Katz.
 
@@ -17,6 +17,8 @@ Some of the main course highlights:
 - Explore Cross-Site Scripting in code.
 - Compare dangerous JavaScript methods and practices in code.
 - Grasp the history of React in response to Security.
+
+---
 
 ### A couple months after the initial release, this course introduced a section on full-stack authentication.
 
